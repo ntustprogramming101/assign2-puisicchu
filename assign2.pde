@@ -43,15 +43,15 @@ gameState=GAME_START;}
 
 void draw() {
 		// Game Start
+// Switch Game State
+switch(gameState){
+case GAME_START:
 //title
 image(titleImg,0,0);
 
 //button
 image(startNormalImg,248,360);
 
-// Switch Game State
-switch(gameState){
-case GAME_START:
 if(248<mouseX&&mouseX<392|360<mouseY&&mouseY<420)
 {if(mousePressed){gameState=GAME_RUN;}
 else{image(startHoveredImg,248,360);

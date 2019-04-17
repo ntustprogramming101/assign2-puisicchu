@@ -1,170 +1,254 @@
-PImage bgImg, soilImg, lifeImg, groundhogIdleImg, robotImg, soldierImg, 
-groundhogDownImg, groundhogLeftImg, groundhogRightImg,
-cabbageImg, titleImg, startNormalImg,startHoveredImg;
+PImage imgBg, imgLife1, imgLife2, imgLife3, imgSoil, imgSoldier;
+PImage imgGroundhogIdle, imgCabbage;
+PImage imgStart, imgGameOver, imgStartNormal, imgStartHovered;
+PImage imgRestartNormal, imgRestartHovered;
+PImage imgGroundhogDown, imgGroundhogLeft, imgGroundhogRight;
 
-float groundhogIdleX=320;
-float groundhogIdleY=80;
-float groundhogSpeed=3;
+int soldierX, soldierY;
+int cabbageX, cabbageY;
+int groundhogX, groundhogY, groundhogSpeed;
 
-boolean upPressed = false;
-boolean downPressed = false;
-boolean leftPressed = false;
-boolean rightPressed = false;
+final int SQUARE_UNIT=80;
+final int BUTTON_X= 248;
+final int BUTTON_Y= 360;
 
-float soldierX=-80;
-float soldierY=80+80*floor(random(4)+1);
-float speedSoldierX=3;
-float cabbageX = 80*(floor(random(8)));
-float cabbageY = 80+80*floor(random(4)+1);
+int totalLife=2;
+int score=1;
 
-int gameState;
-final int GAME_START=1;
-final int GAME_RUN=2;
-final int GAME_OVER=3;
+// moving
+boolean downPressed=false;
+boolean leftPressed=false;
+boolean rightPressed=false;
+
+
+// game
+final int GAME_START=0;
+final int GAME_RUN=1;
+final int GAME_OVER=2;
+int gameState=GAME_START;
+
+// grounghog image
+boolean groundhogIdle=true;
 
 
 void setup() {
-	size(640, 480, P2D);
-	bgImg = loadImage("img/bg.jpg");
-soilImg = loadImage("img/soil.png");
-lifeImg = loadImage("img/life.png");
-groundhogIdleImg = loadImage("img/groundhogIdle.png");
-robotImg = loadImage("img/robot.png");
-soldierImg = loadImage("img/soldier.png");
-groundhogDownImg = loadImage("img/groundhogDown.png");
-groundhogLeftImg = loadImage("img/groundhogLeft.png");
-groundhogRightImg = loadImage("img/groundhogRight.png");
-cabbageImg = loadImage("img/cabbage.png");
-titleImg= loadImage("img/title.jpg");
-startNormalImg=loadImage("img/startNormal.png");
-startHoveredImg=loadImage("img/startHovered.png");
+  size(640, 480, P2D);
+  // image
+  imgBg= loadImage("img/bg.jpg");
+  imgLife1= loadImage("img/life.png");
+  imgLife2= loadImage("img/life.png");
+  imgLife3= loadImage("img/life.png");
+  imgSoil= loadImage("img/soil.png");
+  imgSoldier= loadImage("img/soldier.png");
+  imgGroundhogIdle= loadImage("img/groundhogIdle.png");
+  imgCabbage= loadImage("img/cabbage.png");
+  imgStart= loadImage("img/title.jpg");
+  imgGameOver= loadImage("img/gameover.jpg");
+  imgStartNormal= loadImage("img/startNormal.png");
+  imgStartHovered= loadImage("img/startHovered.png");
+  imgRestartNormal= loadImage("img/restartNormal.png");
+  imgRestartHovered= loadImage("img/restartHovered.png");
+  imgGroundhogDown= loadImage("img/groundhogDown.png");
+  imgGroundhogLeft= loadImage("img/groundhogLeft.png");
+  imgGroundhogRight= loadImage("img/groundhogRight.png");
 
-gameState=GAME_START;}
+  
+  
+  // soldier movement
+  soldierX =-SQUARE_UNIT;
+  soldierY =SQUARE_UNIT*floor(random(2,6));
+  
+  // cabbage appearance
+  cabbageX =SQUARE_UNIT*floor(random(0,6));
+  cabbageY =SQUARE_UNIT*floor(random(2,6));
+  
+  //groundhog
+  groundhogX=SQUARE_UNIT*4;
+  groundhogY=SQUARE_UNIT;
+  groundhogSpeed+=80/16; 
+
+}
+
 
 void draw() {
-		// Game Start
-// Switch Game State
-switch(gameState){
-case GAME_START:
-//title
-image(titleImg,0,0);
-
-//button
-image(startNormalImg,248,360);
-
-if(248<mouseX&&mouseX<392|360<mouseY&&mouseY<420)
-{if(mousePressed){gameState=GAME_RUN;}
-else{image(startHoveredImg,248,360);
-}
-}
-   
-   case GAME_RUN:
-   // Game Run
-// background
-  image(bgImg,0,0);
- 
- //soil
- image(soilImg,0,160);
- 
- //life
- image(lifeImg,10,10);
- image(lifeImg,80,10);
- 
- // grass
- noStroke();
- fill(124, 204, 25);
- rect(0,145,640,15);
- 
- // cabbage
- image(cabbageImg,cabbageX,cabbageY);
- 
- // groundhog movement
- if(downPressed){
- image(groundhogDownImg, groundhogIdleX, groundhogIdleY);
-   groundhogIdleY+=groundhogSpeed;  
- }
- else if(leftPressed){
-   image(groundhogLeftImg, groundhogIdleX, groundhogIdleY);
-   groundhogIdleX-=groundhogSpeed;
- }
- else if(rightPressed){
-   image(groundhogRightImg, groundhogIdleX, groundhogIdleY);
-   groundhogIdleX+=groundhogSpeed;
- }
- else{
-   image(groundhogIdleImg,groundhogIdleX,groundhogIdleY);
- };
-
-//collision of groundhog and soldier
-if(soldierX<groundhogIdleX && groundhogIdleX<soldierX+80 &&soldierY<groundhogIdleY && groundhogIdleY<soldierY+80)
-{groundhogIdleX=320;
-groundhogIdleY=80;}
-
-//eating cabbage
-if(cabbageX<groundhogIdleX && groundhogIdleX<cabbageX+80 && cabbageY<groundhogIdleY && groundhogIdleY<cabbageY+80)
-{cabbageX=-160;cabbageY=-160;
-}
-else{image(cabbageImg,cabbageX,cabbageY);}
-
- // boundary detection
-   if(groundhogIdleX>width-80){
-     groundhogIdleX=width-80;
-   }
-   if(groundhogIdleX<0){
-     groundhogIdleX=0;
-   }
-   if(groundhogIdleY>height-80){
-     groundhogIdleY=height-80;
-   }
-   
- //sun
- stroke(255, 255, 0);
- strokeWeight(5);
- fill(253, 184, 19);
- ellipse(590,50,120,120);
- 
- //soldier animation
- image(soldierImg,soldierX,soldierY);
-soldierX+=speedSoldierX;
-soldierX%=640;}}
-
- // Game Over
- 
- 
-void keyPressed(){
-  if (key==CODED){
-    switch(keyCode){
-      case UP:
-      upPressed=true;
+  switch(gameState){
+    
+    case GAME_START:
+    
+      image(imgStart,0,0);
+      if(mouseX>BUTTON_X && mouseX<BUTTON_X+144 
+      && mouseY>BUTTON_Y && mouseY<BUTTON_Y+60 ){
+        image(imgStartHovered,BUTTON_X,BUTTON_Y);
+        if(mousePressed){
+         gameState=GAME_RUN; 
+        }
+      }else{
+        image(imgStartNormal,BUTTON_X,BUTTON_Y);
+      }
       break;
-      case DOWN:
-      downPressed=true;
-      break;
-      case LEFT:
-      leftPressed=true;
-      break;
-      case RIGHT:
-      rightPressed=true;
-      break;
+    
+    case GAME_RUN:
+
+    // image
+    image(imgBg,0,0);
+    image(imgSoil,0,160);
+    image(imgSoldier,soldierX,soldierY);
+    image(imgCabbage,cabbageX,cabbageY);
+    
+    // lawn
+    noStroke();
+    colorMode(RGB);
+    fill(124,204,25);  
+    rect(0,145,640,15);
+    
+    // sun
+    stroke(255,255,0);  
+    strokeWeight(5);
+    fill(253,184,19);  
+    ellipse(590,50,120,120);
+    
+    // life score
+    if(totalLife==0){
+      gameState=GAME_OVER;
     }
-  }
-}
+    if(totalLife==1){
+      image(imgLife1,10,10);
+    }
+    if(totalLife==2){
+      image(imgLife1,10,10);
+      image(imgLife2,80,10);
+    }
+    if(totalLife==3){
+      image(imgLife1,10,10);
+      image(imgLife2,80,10);
+      image(imgLife3,150,10);
+    }
+    
+    // Grounghog movement
+    
+    if(groundhogIdle){
+      image(imgGroundhogIdle,groundhogX,groundhogY);
+    }
+    
+    if(downPressed){
+      groundhogIdle=false;
+      image(imgGroundhogDown,groundhogX,groundhogY);
+      leftPressed= false;
+      rightPressed= false;
+      groundhogY+=groundhogSpeed;
+      if(groundhogY%80==0){
+        downPressed= false;
+        groundhogIdle=true;
+        }
+    }
+    if(leftPressed){
+      groundhogIdle=false;
+      image(imgGroundhogLeft,groundhogX,groundhogY);
+      downPressed= false;
+      rightPressed= false;
+      groundhogX-=groundhogSpeed;
+      if(groundhogX%80==0){
+        leftPressed= false;
+        groundhogIdle=true;
+        }
+    }
+    if(rightPressed){
+      groundhogIdle=false;
+      image(imgGroundhogRight,groundhogX,groundhogY);
+      leftPressed= false;
+      downPressed= false;
+      groundhogX+=groundhogSpeed;
+      if(groundhogX%80==0){
+        rightPressed= false;
+        groundhogIdle=true;
+        }
+    }
+    
+    // Grounghog boundary detection
+    if(groundhogX<0){
+      leftPressed= false;
+      groundhogIdle=true;
+      groundhogX=0;
+    }
+    if(groundhogX>width-SQUARE_UNIT){
+      rightPressed= false;
+      groundhogIdle=true;
+      groundhogX=width-SQUARE_UNIT;
+    }
+    if(groundhogY>height-SQUARE_UNIT){
+      downPressed= false;
+      groundhogIdle=true;
+      groundhogY=height-SQUARE_UNIT;
+    }
+    
+    // grounghog eat cabbage
+    if(groundhogX<cabbageX+SQUARE_UNIT && groundhogX+SQUARE_UNIT>cabbageX
+      && groundhogY<cabbageY+SQUARE_UNIT && groundhogY+SQUARE_UNIT>cabbageY){
+      cabbageX= width+SQUARE_UNIT;
+      cabbageY= height+SQUARE_UNIT;
+      totalLife+=score;
+     }
+    
+    // soldier movement
+    soldierX+=4;
+    if(soldierX>=width){
+     soldierX=-SQUARE_UNIT; 
+    }
+    
+    // soldier touch groundhog
+    if(groundhogX<soldierX+SQUARE_UNIT && groundhogX+SQUARE_UNIT>soldierX
+    && groundhogY<soldierY+SQUARE_UNIT && groundhogY+SQUARE_UNIT>soldierY){
+      groundhogIdle=true;
+      groundhogX=SQUARE_UNIT*4;
+      groundhogY=SQUARE_UNIT;
+      downPressed= false;
+      leftPressed= false;
+      rightPressed= false;
+      totalLife-=score;
+     }
+    
+   break;
+   
+   case GAME_OVER:
+   image(imgGameOver,0,0);
+   if(mouseX>BUTTON_X && mouseX<BUTTON_X+144 
+      && mouseY>BUTTON_Y && mouseY<BUTTON_Y+60 ){
+        image(imgRestartHovered,BUTTON_X,BUTTON_Y);
+        if(mousePressed){
+         gameState=GAME_RUN;
+         totalLife=2;
+         
+         // soldier move
+        soldierX =-SQUARE_UNIT;
+        soldierY =SQUARE_UNIT*floor(random(2,6));
+  
+        // cabbage move
+        cabbageX =SQUARE_UNIT*floor(random(0,6));
+        cabbageY =SQUARE_UNIT*floor(random(2,6));
+        }
+      }else{
+        image(imgRestartNormal,BUTTON_X,BUTTON_Y);
+      }
+   break;
+ 
+  } // switch
+  
+} // draw
 
-void keyReleased(){
-  if (key==CODED){
-    switch(keyCode){
-      case UP:
-      upPressed=false;
-      break;
+ 
+
+void keyPressed(){
+   if (key == CODED) {
+    switch (keyCode) {
       case DOWN:
-      downPressed=false;
-      break;
+        downPressed = true;
+        break;
       case LEFT:
-      leftPressed=false;
-      break;
+        leftPressed = true;
+        break;
       case RIGHT:
-      rightPressed=false;
-      break;
-  }
+        rightPressed = true;
+        break;
+    }
   }
 }
